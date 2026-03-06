@@ -1,33 +1,38 @@
--- [[ MAIN.LUA - YOUR INTERFACE ]] --
-
--- 1. Load the library file
 local success, Matcha = pcall(function()
-    -- Ensure the filename matches exactly what you saved
-    return loadfile("tirauilib.lua")() 
+    return loadfile("tirauilib.lua")()
 end)
 
--- 2. Safety Check: If the file is missing or has a syntax error, stop here.
-if not success or type(Matcha) ~= "table" then
-    warn("ERROR: Could not load tirauilib.lua!")
-    warn("Reason: " .. tostring(Matcha))
-    return
-end
+if not success then warn("Failed to load Library!") return end
 
--- 3. Now we can safely call CreateWindow
+-- 1. Create Window
 local Window = Matcha:CreateWindow({
-    Name = "My Custom Script",
-    ConfigSaving = true,
-    Keybind = Enum.KeyCode.RightControl
+    Name = "Tira Hub | v1.0"
 })
 
--- 4. Create your Tabs and Sections
-local MainTab = Window:CreateTab({
-    Name = "Home",
-    Icon = "rbxassetid://4483345998"
-})
+-- 2. Create a Tab
+local MainTab = Window:CreateTab("Main Features")
 
-local CombatSection = MainTab:CreateSection({
-    Name = "Combat Settings"
-})
+-- 3. Add a Header
+MainTab:CreateHeader("Character Mods")
 
-print("Success! UI is now running without indexing errors.")
+-- 4. Add a Slider
+MainTab:CreateSlider("Walkspeed", 16, 100, function(value)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+end)
+
+-- 5. Add a Toggle
+MainTab:CreateToggle("Infinite Jump", function(state)
+    _G.InfJump = state
+    game:GetService("UserInputService").JumpRequest:Connect(function()
+        if _G.InfJump then
+            game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+        end
+    end)
+end)
+
+-- 6. Add a Button
+MainTab:CreateButton("Reset Character", function()
+    game.Players.LocalPlayer.Character:BreakJoints()
+end)
+
+print("UI loaded successfully!")
